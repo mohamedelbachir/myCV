@@ -1,159 +1,440 @@
-\documentclass[a4paper,12pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[margin=1in]{geometry}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{titlesec}
-\usepackage{enumitem}
-\usepackage{fontenc}
-\usepackage{microtype}
-\usepackage[normalem]{ulem}
+\documentclass[10pt, letterpaper]{article}
 
-% Couleurs personnalisées
-\definecolor{maincolor}{HTML}{C60000}
-\definecolor{graytext}{HTML}{555555}
+% Paquets :
+\usepackage[
+ignoreheadfoot, % définit les marges sans prendre en compte l'en-tête et le pied de page
+top=2 cm, % séparation entre le corps du texte et le bord de la page par le haut
+bottom=2 cm, % séparation entre le corps du texte et le bord de la page par le bas
+left=2 cm, % séparation entre le corps du texte et le bord de la page par la gauche
+right=2 cm, % séparation entre le corps du texte et le bord de la page par la droite
+footskip=1.0 cm, % séparation entre le corps du texte et le pied de page
+% showframe % pour le débogage
+]{geometry} % pour ajuster la géométrie de la page
+\usepackage[explicit]{titlesec} % pour personnaliser les titres de section
+\usepackage{tabularx} % pour créer des tableaux avec des colonnes à largeur fixe
+\usepackage{array} % tabularx nécessite ceci
+\usepackage[dvipsnames]{xcolor} % pour colorer le texte
+\definecolor{primaryColor}{RGB}{0, 79, 144} % définir la couleur principale
+\usepackage{enumitem} % pour personnaliser les listes
+\usepackage{fontawesome5} % pour utiliser des icônes
+\usepackage{amsmath} % pour les mathématiques
+\usepackage[
+pdftitle={CV de MOHAMED EL BACHIR BOUBA NGANADAKOUA}, % Titre PDF mis à jour
+pdfauthor={MOHAMED EL BACHIR BOUBA NGANADAKOUA}, % Auteur PDF mis à jour
+pdfcreator={LaTeX with RenderCV},
+colorlinks=true,
+urlcolor=primaryColor
+]{hyperref} % pour les liens, métadonnées et signets
+\usepackage[pscoord]{eso-pic} % pour le texte flottant sur la page
+\usepackage{calc} % pour le calcul des longueurs
+\usepackage{bookmark} % pour les signets
+\usepackage{lastpage} % pour obtenir le nombre total de pages
+\usepackage{changepage} % pour les entrées sur une colonne (environnement adjustwidth)
+\usepackage{paracol} % pour les entrées sur deux et trois colonnes
+\usepackage{ifthen} % pour les instructions conditionnelles
+\usepackage{needspace} % pour éviter un saut de page juste après le titre de section
+\usepackage{iftex} % vérifier si le moteur est pdflatex, xetex ou luatex
 
-% Configuration des liens
-\hypersetup{
-	colorlinks=true,
-	linkcolor=maincolor,
-	urlcolor=maincolor
-}
+% Assurer que le PDF généré est lisible par machine/analysable par ATS :
+\ifPDFTeX
+\input{glyphtounicode}
+\pdfgentounicode=1
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} % Déjà dans votre ancien CV
+\usepackage{lmodern}
+\fi
 
-% Formatage des titres
-\titleformat{\section}%
-{\normalfont\large\bfseries\color{maincolor}}{}{0em}{}[\color{maincolor}\titlerule]
+\usepackage[default, type1]{sourcesanspro}
 
-% Formatage personnalisé des éléments de liste
-\setlist[itemize]{topsep=0pt, left=1em, itemsep=3pt}
+% Quelques réglages :
+\AtBeginEnvironment{adjustwidth}{\partopsep0pt} % supprimer l'espace avant l'environnement adjustwidth
+\pagestyle{empty} % pas d'en-tête ni de pied de page
+\setcounter{secnumdepth}{0} % pas de numérotation des sections
+\setlength{\parindent}{0pt} % pas d'indentation
+\setlength{\topskip}{0pt} % pas de saut en haut
+\setlength{\columnsep}{0.15cm} % définir la séparation des colonnes
+\makeatletter
+\let\ps@customFooterStyle\ps@plain % Copie du style "plain" pour 
+% remplacer le numéro par la chaîne désirée
+\makeatother
+\pagestyle{customFooterStyle}
+
+\titleformat{\section}{
+	\needspace{4\baselineskip}
+	\Large\color{primaryColor}
+}{
+}{
+}{
+	\textbf{#1}\hspace{0.15cm}\titlerule[0.8pt]\hspace{-0.1cm}
+}[] % formatage du titre de section
+
+\titlespacing{\section}{
+	-1pt
+}{
+	0.3 cm
+}{
+	0.2 cm
+} % espacement du titre de section
+
+\newenvironment{highlights}{
+	\begin{itemize}[
+		topsep=0.10 cm,
+		parsep=0.10 cm,
+		partopsep=0pt,
+		itemsep=0pt,
+		leftmargin=0.4 cm + 10pt
+		]
+	}{
+	\end{itemize}
+} % nouvel environnement pour les points clés
+
+\newenvironment{highlightsforbulletentries}{
+	\begin{itemize}[
+		topsep=0.10 cm,
+		parsep=0.10 cm,
+		partopsep=0pt,
+		itemsep=0pt,
+		leftmargin=10pt
+		]
+	}{
+	\end{itemize}
+} % nouvel environnement pour les points clés des listes à puces
+
+
+\newenvironment{onecolentry}{
+	\begin{adjustwidth}{
+			0.2 cm + 0.00001 cm
+		}{
+			0.2 cm + 0.00001 cm
+		}
+	}{
+	\end{adjustwidth}
+} % nouvel environnement pour les entrées sur une colonne
+
+\newenvironment{twocolentry}[2][]{
+	\onecolentry
+	\def\secondColumn{#2}
+	\setcolumnwidth{\fill, 4.5 cm} % Largeur de la deuxième colonne ajustée pour les dates/lieux si nécessaire
+	\begin{paracol}{2}
+	}{
+		\switchcolumn \raggedleft \secondColumn
+	\end{paracol}
+	\endonecolentry
+} % nouvel environnement pour les entrées sur deux colonnes
+
+\newenvironment{threecolentry}[3][]{
+	\onecolentry
+	\def\thirdColumn{#3}
+	\setcolumnwidth{2cm, \fill, 4.5 cm} % Première colonne ajustée pour le diplôme, troisième pour la date
+	\begin{paracol}{3}
+		{\raggedright #2} \switchcolumn
+	}{
+		\switchcolumn \raggedleft \thirdColumn
+	\end{paracol}
+	\endonecolentry
+} % nouvel environnement pour les entrées sur trois colonnes
+
+\newenvironment{header}{
+	\setlength{\topsep}{0pt}\par\kern\topsep\centering\color{primaryColor}\linespread{1.5}
+}{
+	\par\kern\topsep
+} % nouvel environnement pour l'en-tête
+
+\newcommand{\placelastupdatedtext}{%
+	\AddToShipoutPictureFG*{%
+		\put(
+		\LenToUnit{\paperwidth-2 cm-0.2 cm+0.05cm},
+		\LenToUnit{\paperheight-1.0 cm}
+		){\vtop{{\null}\makebox[0pt][c]{
+					% Texte de la dernière mise à jour
+					\small\color{gray}\textit{Dernière mise à jour en mai 2025}\hspace{\widthof{Dernière mise à jour en mai 2025}}
+		}}}%
+	}%
+}%
+
+\let\hrefWithoutArrow\href
+\renewcommand{\href}[2]{\hrefWithoutArrow{#1}{\ifthenelse{\equal{#2}{}}{ }{#2 }\raisebox{.15ex}{\footnotesize \faExternalLink*}}}
 
 \begin{document}
+	\newcommand{\AND}{\unskip
+		\cleaders\copy\ANDbox\hskip\wd\ANDbox
+		\ignorespaces
+	}
+	\newsavebox\ANDbox
+	\sbox\ANDbox{}
 	
-	% En-tête
-	\begin{center}
-		\textbf{\Huge MOHAMED EL BACHIR}\\
-		\vspace{2mm}
-		\textbf{\Large BOUBA NGANADAKOUA}
-	\end{center}
-	
-	\noindent
-	\textbf{Date et lieu de naissance :} 02 août 2002, Garoua\\
-	\textbf{Nationalité :} Camerounaise\\
-	\textbf{Téléphone :} (+237) 698 34 06 64\\
-	\textbf{Email :} \href{mailto:mohamedelbachirboubanganadakou@gmail.com}{mohamedelbachirboubanganadakou@gmail.com}\\
-	\textbf{GitHub :} \href{https://github.com/mohamedelbachir}{github.com/mohamedelbachir}\\
-	\textbf{Portfolio :} \href{https://bachdev.vercel.app}{bachdev.vercel.app}\\
-	\textbf{LinkedIn :} \href{https://www.linkedin.com/in/mohamed-el-bachir/}{linkedin.com/in/mohamed-el-bachir/}
-	
-	\vspace{5mm}
-	
-	% Présentation
-	\section*{Présentation}
-	Je suis titulaire d'un Master 2 en Informatique, spécialisé dans l'architecture des systèmes logiciels et les environnements distribués. Passionné par la programmation et l'innovation technologique, je souhaite mettre mes compétences au service de projets ayant un impact positif, en apportant des solutions modernes et performantes.
-	
-	\vspace{5mm}
-	
-	% Formation
-	\section*{Formation}
-	\begin{itemize}
-		\item \textbf{Master 2 en Informatique} – Spécialité Système Logiciel et Environnements Distribués (\textit{SLED}) : Thème : \textit{Deep Analysis and Prediction of Chikungunya Using Ensemble Regression Approach}, 2024, mention \textit{Très Bien}.
-		\item \textbf{Master 1 Recherche en Informatique} – Spécialité \textbf{SLED}, Université de Ngaoundéré, 2023, mention \textit{Assez Bien}, Major de promotion.
-		\item \textbf{Licence en Informatique}, Université de Ngaoundéré, 2022, mention \textit{Assez Bien}.
-		\item \textbf{Baccalauréat Série C}, 2019, mention \textit{Assez Bien}.
-	\end{itemize}
-	
-	\vspace{5mm}
-	
-	% Langues
-	\section*{Langues}
-	\begin{itemize}
-		\item \textbf{Français} : Courant
-		\item \textbf{Anglais} : Niveau B1
-	\end{itemize}
-	
-	% Compétences
-	\section*{Compétences Techniques}
-	\begin{itemize}
-		\item \textbf{Développement Frontend} : ReactJS, Styled Components, Sass, TailwindCSS, NextJS, AstroJS, React Native.
-		\item \textbf{Développement Backend} : NodeJS, ExpressJS, Firebase, Drizzle ORM, PostgreSQL.
-		\item \textbf{Bibliothèques et Frameworks} : SDL, ImGUI, Mantine UI, Shadcn UI, Material UI.
-		\item \textbf{Langages de Programmation} : C, C++, JavaScript, TypeScript, Python.
-		\item \textbf{Outils} : Git, VSCode, CMake.
-		\item \textbf{Déploiement} : Netlify, Vercel, WebHostApp, Render.
-	\end{itemize}
-	
-	% Expérience Professionnelle
-	\section*{Expérience Professionnelle}
-	\begin{itemize}
-		\item \textbf{2024 – Présent} : Stage Professionnel en tant que \textbf{Développeur Frontend} chez \textbf{Sygalin Sas CANAL +}, Ngaoundéré. Développement d'une application de gestion d'association (AssoEase) en utilisant \textbf{React}, \textbf{TypeScript}, \textbf{Mantine UI}.
-		\item \textbf{2019} : Attestation de fin de formation en \textbf{Initiation à la Maintenance et aux Caméras de Surveillance} à la \textbf{GI} (Généralité Informatique), Garoua, mention \textit{Bien}.
-	\end{itemize}
-	
-	% Certifications
-	\section*{Certifications}
-	\begin{itemize}
-		\item \textbf{C++} – Sololearn : \href{https://www.sololearn.com/en/certificates/CT-X8YY1SDM}{Référence}.
-		\item \textbf{Building Blog using MERN Stack} – Udemy : \href{https://www.udemy.com/certificate/UC-e01be5eb-a327-4f45-b5f2-73cc5fcf5d0c/}{Référence}.
-		\item \textbf{Latex} – AUF : \href{https://www.linkedin.com/in/mohamed-el-bachir/}{Référence}.
-		\item \textbf{CITS} – Cameroon International Tech Summit : Participant au hackathon national en tant que dévéloppeur frontend et \textbf{Chef d'équipe} d'une équipe de \textbf{5 personnes}, \href{https://www.linkedin.com/in/mohamed-el-bachir/}{Référence}.
-	\end{itemize}
-	
-	% Centres d'Intérêt
-	\section*{Centres d'Intérêt}
-	Programmation, Sciences, Animaux, Anime, Jeux Vidéo, Bandes Dessinées.
-	
-	% Projets
-	\section*{Projets}
-	\begin{itemize}
-		\item \textbf{Scheduler} : Logiciel de visualisation de diagrammes de GANT pour l’ordonnancement des processus dans les systèmes UNIX. Développé en \textbf{C++}.
-		\begin{itemize}
-			\item Gestion de thèmes.
-			\item Implémentation des algorithmes d'ordonnancement : Round Robin, FCFS, SJF, SRTF.
-			\item Documentation complète.
-		\end{itemize}
-		\textbf{Outils} : C++, SDL, ImGui, SDL\_TTF, SDL\_Image, TypeScript, Astro.\\
-		\href{https://github.com/mohamedelbachir/Scheduler}{Voir le projet.}
+	\placelastupdatedtext
+	\begin{header}
+		% Nom mis à jour
+		\fontsize{28 pt}{28 pt} % Taille de police ajustée pour un nom plus long
+		\textbf{MOHAMED EL BACHIR}
 		
-		\item \textbf{U-sentry} : Plateforme de gestion d'alertes dans le milieu universitaire. Développée avec \textbf{React}, \textbf{Expo}, \textbf{TypeScript}, \textbf{Redux}, \textbf{Supabase}, \textbf{React Native}.
-		\begin{itemize}
-			\item Gestion des posts et des notifications.
-			\item Interface utilisateur mobile avec parcours personnalisé et favoris.
-			\item Mises à jour en temps réel avec Supabase.
-		\end{itemize}
-		\href{https://bachdev.vercel.app/projects/u-sentry}{Voir le projet.}
+		\fontsize{20 pt}{20 pt} % Taille de police ajustée pour un nom plus long
+		\textbf{BOUBA NGANADAKOUA}
 		
-		\item \textbf{Chair Rental} : Plateforme de réservation de chaises pour événements au Cameroun (en cours).
-		\begin{itemize}
-			\item Gestion du panier et suivi des produits.
-			\item Tableau de bord administrateur.
-		\end{itemize}
-		\textbf{Outils} : React, TypeScript, Redux.\\
-		\href{https://chair-rental.vercel.app/}{Voir le projet.}
+		\vspace{0.3 cm}
 		
-		\item \textbf{Généralité Informatique} : E-commerce de produits technologiques, y compris caméras et fournitures. 
-		\begin{itemize}
-			\item Affichage des produits et gestion du catalogue.
-			\item Interface de type landing page et tableau de bord administrateur.
-		\end{itemize}
-		\textbf{Outils} : React, JavaScript, Firebase, Material UI, Sass.\\
-		\href{https://generaliteinformatique.vercel.app}{Voir le projet.}
-		
-		\item \textbf{Woconnex} : Plateforme développée lors du hackathon CITS 2024 sur la disparité de genre dans les secteurs technologiques (en cours).
-		\begin{itemize}
-			\item Gestion des profils, du feed, et de l’abonnement.
-		\end{itemize}
-		\textbf{Outils} : React, TypeScript, Redux.\\
-		\href{https://woconnex.vercel.app/dashboard}{Voir le projet.}
-		
-		\item \textbf{Jumper} : Jeu éducatif en \textbf{C++} pour apprendre les bases de la programmation.
-		\begin{itemize}
-			\item Gestion de l’écran, des sons et des contrôles.
-		\end{itemize}
-		\textbf{Outils} : C++, SDL.\\
-		\href{https://github.com/mohamedelbachir/JumperGame}{Voir le projet.}
-	\end{itemize}
+		\normalsize
+		% Utilisation de Garoua (lieu de naissance) comme lieu, veuillez mettre à jour si nécessaire
+		\mbox{{\footnotesize\faMapMarker*}\hspace*{0.13cm}Limbe, Cameroun}%
+		\kern 0.25 cm%
+		\AND%
+		\kern 0.25 cm%
+		\mbox{\hrefWithoutArrow{mailto:mohamedelbachirboubanganadakou@gmail.com}{{\footnotesize\faEnvelope[regular]}\hspace*{0.13cm}mohamedelbachirboubanganadakou@gmail.com}}%
+		\kern 0.25 cm%
+		\AND%
+		\kern 0.25 cm%
+		\mbox{\hrefWithoutArrow{tel:+237698340664}{{\footnotesize\faPhone*}\hspace*{0.13cm}(+237) 698 34 06 64}}%
+		\kern 0.25 cm%
+		\AND%
+		\kern 0.25 cm%
+		\mbox{{\footnotesize\faBirthdayCake}\hspace*{0.13cm} 02 août 2002}% % Changed icon to faGlobe for portfolio
+		\kern 0.25 cm%
+		\mbox{\href{https://bachdev.vercel.app/}{{\footnotesize\faGlobe}\hspace*{0.13cm}mon site web}}% % Changed icon to faGlobe for portfolio
+		\kern 0.25 cm%
+		\AND%
+		\kern 0.25 cm%
+		\mbox{\href{https://www.linkedin.com/in/mohamed-el-bachir/}{{\footnotesize\faLinkedinIn}\hspace*{0.13cm}mon linkedin}}%
+		\kern 0.25 cm%
+		\AND%
+		\kern 0.25 cm%
+		\mbox{\href{https://github.com/mohamedelbachir}{{\footnotesize\faGithub}\hspace*{0.13cm}mon github}}%
+	\end{header}
 	
-	\vspace{5mm}
-	Pour découvrir plus de projets, visitez : \href{https://bachdev.vercel.app/projects}{https://bachdev.vercel.app/projects}
+	\vspace{0.3 cm} % Removed extra negative vspace
+	
+	\section{Résumé}
+	\begin{onecolentry}
+		Titulaire d'un Master II en Informatique, spécialisé en architecture de systèmes logiciels et environnements distribués. Passionné par la programmation et l'innovation technologique, je vise à mettre mes compétences au service de projets à impact positif, en livrant des solutions modernes et efficientes.
+		%\textit{Date de naissance : 02 août 2002. Nationalité : Camerounaise.} % Added DOB and Nationality here.
+	\end{onecolentry}
+	
+	\section{Formation}
+	\begin{threecolentry}{\textbf{Master II}}{\textit{2024}}
+		\textbf{Université de Ngaoundéré}, Informatique – Spécialisation : Systèmes Logiciels et Environnements Distribués (\textit{SLED})
+		\begin{highlights}
+			\item Mémoire : \textit{Analyse approfondie et prédiction du Chikungunya par une approche de régression ensembliste}
+			\item Mention : \textit{Très Bien}
+		\end{highlights}
+	\end{threecolentry}
+	\vspace{0.2 cm}
+	\begin{threecolentry}{\textbf{Master I}}{\textit{2023}}
+		\textbf{Université de Ngaoundéré}, Master de Recherche en Informatique – Spécialisation : \textbf{SLED}
+		\begin{highlights}
+			\item Mention : \textit{Assez Bien}
+			\item Major de promotion
+		\end{highlights}
+	\end{threecolentry}
+	\vspace{0.2 cm}
+	\begin{threecolentry}{\textbf{Licence}}{\textit{2022}} % Licence en Informatique
+		\textbf{Université de Ngaoundéré}, Informatique
+		\begin{highlights}
+			\item Mention : \textit{Assez Bien}
+		\end{highlights}
+	\end{threecolentry}
+	\vspace{0.2 cm}
+	\begin{threecolentry}{\textbf{Baccalauréat C}}{\textit{2019}} % Baccalauréat Série C
+		(Baccalauréat Scientifique) % Clarification for international context
+		\begin{highlights}
+			\item Mention : \textit{Assez Bien}
+		\end{highlights}
+	\end{threecolentry}
+	
+	\section{Expérience}
+	\begin{twocolentry}{Maroua, Cameroun \textit{2025} – }
+		\textbf{GNDC (Grand Nord Developer Community)} \textit{Temps partiel} , Développeur Frontend Principal
+		% Aucun point clé spécifique n'a été fourni dans l'ancien CV pour ce rôle. À ajouter si disponible.
+		\begin{highlights}
+			\item Je gère l'équipe et la planification des tâches.
+			\item J'ai développé le Frontend du site web en utilisant \textbf{NextJS} , \textbf{TailwindCSS}.
+			\item J'ai implémenté l'authentification et l'autorisation avec LuciaAuth et travaillé avec les \textbf{server action}.
+			\item J'ai intégré la base de données en utilisant \textbf{Supabase} et un ORM \textbf{Drizzle ORM}.
+		\end{highlights}
+	\end{twocolentry}
+	\begin{twocolentry}{Maroua, Cameroun \textit{2025} – }
+		\textbf{MIT (Maroua Innovation technologie)} \textit{Temps partiel} , Développeur Web
+		% Aucun point clé spécifique n'a été fourni dans l'ancien CV pour ce rôle. À ajouter si disponible.
+		% \begin{highlights}
+			% \item Développement de X et Y.
+			% \end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{Ngaoundéré, Cameroun \textit{2024} – \textit{2025}}
+		\textbf{Sygalin Sas CANAL +}, Stagiaire Développeur Frontend
+		\begin{highlights}
+			\item Développement d'une application de gestion d'associations (AssoEase).
+			\item Technologies utilisées : \textbf{React}, \textbf{TypeScript}, \textbf{Mantine UI}.
+		\end{highlights}
+	\end{twocolentry}
+	\section{Bénévolat}
+	\begin{twocolentry}{À distance, \textit{Mai 2025} – }
+		\textbf{HireMe} \textit{Temps partiel} , Développeur Web \& Mobile
+		% Aucun point clé spécifique n'a été fourni dans l'ancien CV pour ce rôle. À ajouter si disponible.
+		% \begin{highlights}
+			% \item Développement de X et Y.
+			% \end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{Garoua, Cameroun\\ \textit{Juil 2022} – \textit{Août 2022}}
+		\textbf{GI (Géneralité informatique)}, Développeur Web
+	\end{twocolentry}
+	\section{Projets}
+	\begin{twocolentry}{\href{gndc-website.onrender.com}{Voir le projet}}
+		\textbf{Site web GNDC} 
+		\begin{highlights}
+			\item Création d'une interface conviviale pour la communauté.
+			\item Mise en place de l'authentification et de l'autorisation.
+			\item Ajout d'un système de gestion de contenu.
+			\item \textbf{Outils} : PostgreSQL, Next.js, Tailwind CSS, Supabase, TypeScript, DrizzleORM, Zod, MDX , LuciaAuth.
+			\item \textbf{Open Source} : \href{https://github.com/grand-Nord-Developpers-Community/website}{Voir le projet}
+		\end{highlights}
+	\end{twocolentry}
+	\begin{twocolentry}{\href{https://f2ee-website.vercel.app/}{Voir le projet}}
+		\textbf{F2IE} 
+		\begin{highlights}
+			\item Création d'une interface conviviale où les utilisateurs peuvent voter, avec un tableau de bord pour gérer leurs comptes.
+			\item Fonctionnalités : Authentification, gestion des fichiers, RBAC.
+			\item \textbf{Outils} : PostgreSQL, Next.js, Tailwind CSS, Supabase, TypeScript.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://bachdev.vercel.app/projects/u-sentry}{Voir le projet Web}\\ \href{https://github.com/mohamedelbachir/u-sentry-app}{Voir le projet App}} % Multiple links
+		\textbf{U-sentry}
+		\begin{highlights}
+			\item Application Android et iOS de gestion des alertes en milieu universitaire.
+			\item Fonctionnalités : Gestion des publications et des notifications, interface utilisateur mobile avec parcours personnalisés et favoris, mises à jour en temps réel avec Supabase.
+			\item \textbf{Outils} : React, Expo, TypeScript, Redux, Supabase, React Native.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://chair-rental.vercel.app/}{Voir le projet}}
+		\textbf{Chair Rental} (En cours)
+		\begin{highlights}
+			\item Plateforme e-commerce pour la réservation de chaises pour des événements au Cameroun.
+			\item Fonctionnalités : Gestion du panier, suivi des produits, tableau de bord administrateur.
+			\item \textbf{Outils} : React, TypeScript, Redux.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://generaliteinformatique.vercel.app}{Voir le projet}}
+		\textbf{Généralité Informatique}
+		\begin{highlights}
+			\item E-commerce pour produits technologiques, incluant caméras et fournitures.
+			\item Fonctionnalités : Affichage des produits, gestion du catalogue, interface de type page d'atterrissage, tableau de bord administrateur.
+			\item \textbf{Outils} : React, JavaScript, Firebase, Material UI, Sass.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://github.com/mohamedelbachir/Scheduler}{Voir le projet}}
+		\textbf{Scheduler}
+		\begin{highlights}
+			\item Logiciel de visualisation de diagrammes de GANTT pour l'ordonnancement de processus dans les systèmes UNIX.
+			\item Fonctionnalités : Gestion des thèmes, implémentation des algorithmes d'ordonnancement (Round Robin, FCFS, SJF, SRTF) et documentation complète.
+			\item \textbf{Outils} : C++, SDL, ImGui, SDL\_TTF, SDL\_Image, TypeScript, Astro.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://github.com/mohamedelbachir/JumperGame}{Voir le projet}}
+		\textbf{Jumper}
+		\begin{highlights}
+			\item Jeu éducatif en C++ pour apprendre les bases de la programmation.
+			\item Fonctionnalités : Gestion de l'écran, du son et des contrôles.
+			\item \textbf{Outils} : C++, SDL.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.1 cm}
+	\begin{onecolentry}
+		Pour plus de projets, visitez : \href{https://github.com/mohamedelbachir?tab=repositories}{mon dépôt github}.
+	\end{onecolentry}
+	
+	\section{Compétences Techniques}
+	\begin{onecolentry}
+		\textbf{Développement Frontend :} ReactJS, Styled Components, Sass, TailwindCSS, NextJS, AstroJS, React Native.
+	\end{onecolentry}
+	\vspace{0.1cm}
+	\begin{onecolentry}
+		\textbf{Développement Backend :} NodeJS, ExpressJS, Firebase, Drizzle ORM, PostgreSQL, PHP.
+	\end{onecolentry}
+	\vspace{0.1cm}
+	\begin{onecolentry}
+		\textbf{Librairies \& Frameworks :} NextJS, SDL, ImGUI, Mantine UI, Shadcn UI, Material UI.
+	\end{onecolentry}
+	\vspace{0.1cm}
+	\begin{onecolentry}
+		\textbf{Langages de Programmation :} C, C++, JavaScript, TypeScript, Python.
+	\end{onecolentry}
+	\vspace{0.1cm}
+	\begin{onecolentry}
+		\textbf{Outils :} Git, VSCode, CMake,Cursor, Codeblocks.
+	\end{onecolentry}
+	\vspace{0.1cm}
+	\begin{onecolentry}
+		\textbf{Déploiement :} Netlify, Vercel, WebHostApp, Render.
+	\end{onecolentry}
+	
+	\section{Certifications}
+	% Using twocolentry for a cleaner look with links on the side
+	\begin{twocolentry}{\href{https://coursera.org/share/f2295e7b2b4aee2003ecfe47bfd1807dM}{Certificat Coursera}}
+		\textbf{Développeur Frontend Meta}
+		% \begin{highlights} % Can add details if needed
+			% \item Délivré par Sololearn
+			% \end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://www.credly.com/badges/be9c508a-bdb8-4444-89db-16967c8b606a/public_url}{Certificat Creedly}}
+		\textbf{Développeur Frontend}
+		% \begin{highlights} % Can add details if needed
+			% \item Délivré par Sololearn
+			% \end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://www.sololearn.com/en/certificates/CT-X8YY1SDM}{Certificat Sololearn}}
+		\textbf{C++}
+		% \begin{highlights} % Can add details if needed
+			% \item Délivré par Sololearn
+			% \end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	
+	\begin{twocolentry}{\href{https://www.udemy.com/certificate/UC-e01be5eb-a327-4f45-b5f2-73cc5fcf5d0c/}{Certificat Udemy}}
+		\textbf{Building Blog using MERN Stack}
+		\begin{highlights} % Can add details if needed
+			\item Technologies : Mongo , Express , React , NodeJS
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://www.linkedin.com/in/mohamed-el-bachir/details/certifications/}{Lien du Certificat AUF}} % Assuming this link is for the cert
+		\textbf{LaTeX} – Délivré par l'AUF
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{twocolentry}{\href{https://www.linkedin.com/in/mohamed-el-bachir/details/certifications/}{Certification CITS}} % Assuming this link shows participation
+		\textbf{CITS – Sommet International de la Technologie du Cameroun}
+		\begin{highlights}
+			\item Participant au hackathon national en tant que développeur frontend.
+			\item Chef d'équipe pour une équipe de 5 personnes.
+		\end{highlights}
+	\end{twocolentry}
+	\vspace{0.2 cm}
+	\begin{onecolentry} % Kept as onecolentry as it's more of a vocational training
+		\textbf{Certificat d'Initiation à la Maintenance et aux Caméras de Surveillance} (2019)
+		\begin{highlights}
+			\item Délivré par \textbf{GI (Généralité Informatique)}, Garoua.
+			\item Mention : \textit{Bien}.
+		\end{highlights}
+	\end{onecolentry}
+	
+	
+	\section{Langues}
+	\begin{onecolentry}
+		\begin{highlightsforbulletentries} % Using highlights for bullet points
+			\item \textbf{Français :} Courant
+			\item \textbf{Anglais :} Niveau B2
+		\end{highlightsforbulletentries}
+	\end{onecolentry}
+	
+	\section{Centres d'Intérêt}
+	\begin{onecolentry}
+		Programmation, Science, Animaux, Anime, Jeux Vidéo, Bandes Dessinées.
+	\end{onecolentry}
 	
 \end{document}
